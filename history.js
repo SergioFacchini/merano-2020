@@ -2,34 +2,50 @@ const RECENT_THRESHOLDS_MINUTES = 10;
 
 class History {
     
-    _messages = [];
+    _readings = [];
     
-    addMessage(message) {
-        this._messages.push(message);
+    addReading(reading) {
+        this._readings.push(reading);
+        reading.statistics = this._computeStatistics(reading.mac);
+        return reading;
     }
 
-    getRecentMesages() {
+    getRecentReadings() {
         this._removeOldMessages();
-        return this._messages;
+        return this._readings;
     }
     
     _removeOldMessages() {
         const tenMiutesAgo = this._tenMinutesAgo();
         let toRemove = 0;
-        for (let message of this._messages) {
-            if (message.timestamp < tenMiutesAgo) {
+        for (let reading of this._readings) {
+            if (reading.timestamp < tenMiutesAgo) {
                 toRemove++;
             } else {
                 break;
             }
         }
-        this._messages.splice(0, toRemove);
-        console.log(`[HISTORY] Removed ${toRemove} old messages`);
+        this._readings.splice(0, toRemove);
+        if (toRemove > 0) {
+            console.log(`[HISTORY] Removed ${toRemove} old readings`);
+        }
     }
 
     _tenMinutesAgo() {
         const now = new Date();
         return now.setMinutes(now.getMinutes() - RECENT_THRESHOLDS_MINUTES);
+    }
+
+    _computeStatistics(mac) {
+        this._removeOldMessages();
+        const readings = this._readings
+            .filter(reading => reading.mac === mac)
+            .map(reading => reading.bpm);
+        return {
+            max: Math.max(...readings),
+            min: Math.min(...readings),
+            avg: readings.reduce((a, b) => a + b) / readings.length
+        };
     }
 }
 

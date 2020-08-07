@@ -29,11 +29,12 @@ clientMqtt.on('connect', function () {
 clientMqtt.on('message', function (topic, message) {
     console.log('Recieved: ' + message.toString());
     
+    const json = JSON.parse(message.toString());
+    const update = history.addReading(json);
+    
     currentSockets.forEach((socket) => {
-        socket.emit('update', message);
+        socket.emit('update', JSON.stringify(json));
     });
-
-    history.addMessage(JSON.parse(message.toString()));
 });
 
 
@@ -41,7 +42,9 @@ io.on('connection', (socket) => {
     // Client connection
     currentSockets.push(socket);
     
-    history.getRecentMesages().forEach(message => socket.emit('update', JSON.stringify(message)));
+    history.getRecentReadings().forEach(reading => {
+        socket.emit('update', JSON.stringify(reading));
+    });
 
     socket.on('disconnect', () => {
         // Client disconnected
@@ -49,4 +52,3 @@ io.on('connection', (socket) => {
         console.log('user disconnected');
     });
 });
-
