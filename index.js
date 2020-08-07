@@ -30,11 +30,10 @@ clientMqtt.on('message', function (topic, message) {
     const json   = JSON.parse(message.toString());
     const update = history.addReading(json);
 
-    const updateJson = JSON.stringify(update);
-    console.log('Received: ' + updateJson);
+    console.log('Received: ' + JSON.stringify(update));
 
     currentSockets.forEach((socket) => {
-        socket.emit('update', updateJson);
+        socket.emit('update', update);
     });
 });
 
@@ -42,14 +41,22 @@ clientMqtt.on('message', function (topic, message) {
 io.on('connection', (socket) => {
     // Client connection
     currentSockets.push(socket);
-    
-    history.getRecentReadings().forEach(reading => {
-        socket.emit('update', JSON.stringify(reading));
-    });
+
+    setTimeout(() => {
+        history.getRecentReadings().forEach(reading => {
+            socket.emit('update', reading);
+        });
+    }, 500);
+
 
     socket.on('disconnect', () => {
         // Client disconnected
         currentSockets = currentSockets.filter((s) => s !== socket);
         console.log('user disconnected');
     });
+});
+
+
+http.listen(3000, () => {
+    console.log("Listening port 3000");
 });
