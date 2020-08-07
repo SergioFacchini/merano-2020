@@ -11,6 +11,9 @@ let app  = require('express')();
 let http = require('http').createServer(app);
 let io   = require('socket.io')(http);
 
+let History = require('./history');
+let history = new History();
+
 let currentSockets = [];
 
 clientMqtt.on('connect', function () {
@@ -25,16 +28,20 @@ clientMqtt.on('connect', function () {
 
 clientMqtt.on('message', function (topic, message) {
     console.log('Recieved: ' + message.toString());
-
+    
     currentSockets.forEach((socket) => {
         socket.emit('update', message);
     });
+
+    history.addMessage(JSON.parse(message.toString()));
 });
 
 
 io.on('connection', (socket) => {
     // Client connection
     currentSockets.push(socket);
+    
+    history.getRecentMesages().forEach(message => socket.emit('update', JSON.stringify(message)));
 
     socket.on('disconnect', () => {
         // Client disconnected
