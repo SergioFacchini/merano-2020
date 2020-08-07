@@ -44,7 +44,7 @@ class History {
         return {
             max: Math.max(...readings),
             min: Math.min(...readings),
-            avg: readings.reduce((a, b) => a + b) / readings.length
+            avg: Math.floor(readings.reduce((a, b) => a + b) / readings.length)
         };
     }
 }

@@ -27,13 +27,14 @@ clientMqtt.on('connect', function () {
 })
 
 clientMqtt.on('message', function (topic, message) {
-    console.log('Recieved: ' + message.toString());
-    
-    const json = JSON.parse(message.toString());
+    const json   = JSON.parse(message.toString());
     const update = history.addReading(json);
-    
+
+    const updateJson = JSON.stringify(update);
+    console.log('Received: ' + updateJson);
+
     currentSockets.forEach((socket) => {
-        socket.emit('update', JSON.stringify(json));
+        socket.emit('update', updateJson);
     });
 });
 
