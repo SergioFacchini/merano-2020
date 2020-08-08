@@ -28,13 +28,13 @@ clientMqtt.on('connect', function () {
 })
 
 clientMqtt.on('message', function (topic, message) {
-    console.log('Recieved: ' + message.toString());
-    
-    const json = JSON.parse(message.toString());
+    const json   = JSON.parse(message.toString());
     const update = history.addReading(json);
-    
+
+    console.log('Received: ' + JSON.stringify(update));
+
     currentSockets.forEach((socket) => {
-        socket.emit('update', JSON.stringify(json));
+        socket.emit('update', update);
     });
 });
 
@@ -42,10 +42,13 @@ clientMqtt.on('message', function (topic, message) {
 io.on('connection', (socket) => {
     // Client connection
     currentSockets.push(socket);
-    
-    history.getRecentReadings().forEach(reading => {
-        socket.emit('update', JSON.stringify(reading));
-    });
+
+    setTimeout(() => {
+        history.getRecentReadings().forEach(reading => {
+            socket.emit('update', reading);
+        });
+    }, 500);
+
 
     socket.on('disconnect', () => {
         // Client disconnected
@@ -53,7 +56,6 @@ io.on('connection', (socket) => {
         console.log('user disconnected');
     });
 });
-
 
 // Load initial data
 [
@@ -71,3 +73,6 @@ io.on('connection', (socket) => {
     console.log(`[MAIN] ${readings.length} readings added (moved into the future of ${difference / 360} minutes)`);
 });
 
+http.listen(3000, () => {
+    console.log("Listening port 3000");
+});
