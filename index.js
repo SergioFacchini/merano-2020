@@ -59,7 +59,10 @@ io.on('connection', (socket) => {
 
 // Load initial data
 Object.entries({
-    "client-0": "recordings/sebastiano-1.json"
+    "CC:74:2F:87:DC:17": "recordings/lorenzo-1.json",
+    "client-0": "recordings/sebastiano-1.json",
+    "client-1": "recordings/slava-1.json",
+    "client-2": "recordings/simone-1.json",
 }).forEach(([mac, fileName]) => {
     const data = fs.readFileSync(fileName).toString();
     const readings = JSON.parse(data);

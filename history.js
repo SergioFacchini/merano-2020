@@ -31,6 +31,11 @@ class History {
         this._readings.splice(0, toRemove);
         if (toRemove > 0) {
             console.log(`[HISTORY] Removed ${toRemove} old readings`);
+
+            // recording
+            //this.storeReadings("simone-1.json");
+            //console.log("recording completed");
+            //process.exit(-1);
         }
     }
 
