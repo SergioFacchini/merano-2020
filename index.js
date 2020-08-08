@@ -58,19 +58,21 @@ io.on('connection', (socket) => {
 });
 
 // Load initial data
-[
-    "recordings/sebastiano-1.json"
-].forEach(fileName => {
+Object.entries({
+    "client-0": "recordings/sebastiano-1.json"
+}).forEach(([mac, fileName]) => {
     const data = fs.readFileSync(fileName).toString();
     const readings = JSON.parse(data);
     const difference = new Date().getTime() - readings[readings.length - 1].timestamp;
     readings.forEach(reading => {
         history.addReading({
             reading,
-            timestamp: new Date().setTime(reading.timestamp + difference)
+            timestamp: new Date().setTime(reading.timestamp + difference),
+            mac
         });
+        console.log(history)
     });
-    console.log(`[MAIN] ${readings.length} readings added (moved into the future of ${difference / 360} minutes)`);
+    console.log(`[MAIN] ${readings.length} readings added (moved into the future of ${Math.floor(difference / (1000 * 60))} minutes)`);
 });
 
 http.listen(3000, () => {
