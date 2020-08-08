@@ -1,5 +1,8 @@
 const RECENT_THRESHOLDS_MINUTES = 10;
 
+let fs = require('fs');
+
+
 class History {
     
     _readings = [];
@@ -46,6 +49,12 @@ class History {
             min: Math.min(...readings),
             avg: readings.reduce((a, b) => a + b) / readings.length
         };
+    }
+
+
+    // Call this function using the debugger
+    storeReadings(fileName) {
+        fs.writeFileSync(`recordings/${fileName}`, JSON.stringify(this._readings));
     }
 }
 

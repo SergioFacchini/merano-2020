@@ -1,5 +1,6 @@
 
 let settings = require('./settings');
+let fs = require('fs');
 
 let mqtt = require('mqtt')
 let clientMqtt = mqtt.connect('mqtt://81.161.233.141', {
@@ -52,3 +53,21 @@ io.on('connection', (socket) => {
         console.log('user disconnected');
     });
 });
+
+
+// Load initial data
+[
+    "recordings/sebastiano-1.json"
+].forEach(fileName => {
+    const data = fs.readFileSync(fileName).toString();
+    const readings = JSON.parse(data);
+    const difference = new Date().getTime() - readings[readings.length - 1].timestamp;
+    readings.forEach(reading => {
+        history.addReading({
+            reading,
+            timestamp: new Date().setTime(reading.timestamp + difference)
+        });
+    });
+    console.log(`[MAIN] ${readings.length} readings added (moved into the future of ${difference / 360} minutes)`);
+});
+
