@@ -66,11 +66,10 @@ Object.entries({
     const difference = new Date().getTime() - readings[readings.length - 1].timestamp;
     readings.forEach(reading => {
         history.addReading({
-            reading,
+            ...reading,
             timestamp: new Date().setTime(reading.timestamp + difference),
             mac
         });
-        console.log(history)
     });
     console.log(`[MAIN] ${readings.length} readings added (moved into the future of ${Math.floor(difference / (1000 * 60))} minutes)`);
 });
